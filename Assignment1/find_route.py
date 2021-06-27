@@ -28,7 +28,7 @@ def uninformedSearch(routes, origin, dest):
             print(origin, 'to', str(dest) + ',', result[0][0], 'km')
 
     else:
-        print('Nodes expanded:' + str(result[1][0]) + '\nNodes generated:' + str(result[1][1]))
+        print('Nodes expanded:' + str(result[0][1][0]) + '\nNodes generated:' + str(result[0][1][1]))
         print('Distance: Infinity')
         print('Route:\nNone')
 
@@ -52,7 +52,7 @@ def UCS(fringe, visited, routes, origin, dest, nodes, path):
         for city in routes[closest]:
             nodes[1] = nodes[1] + 1
 
-            if(city not in routes or city not in fringe):
+            if(not (city in visited or city in fringe)):
                 fringe[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
 
             elif(city in fringe or city in visited):
