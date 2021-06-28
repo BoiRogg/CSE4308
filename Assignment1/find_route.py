@@ -102,10 +102,16 @@ def informedSearch(routes, origin, dest, huer):
 
     def loop(nodesCreated, nodesExp, nodesPop):
         nodesExp += 1
+
         node = fringe.pop(0)
 
         if(node.current == dest):
-            quit()
+            print("Nodes popped: ", nodesPop)
+            print("Nodes Expanded: ", nodesExp)
+            print("Nodes generated", nodesCreated)
+            print("Route: ")
+            return
+
 
         loop(nodesCreated, nodesExp, nodesPop)
 
