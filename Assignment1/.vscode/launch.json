@@ -12,8 +12,9 @@
             "console": "integratedTerminal",
             "args": [
                 "input1.txt",
-                "London", 
-                "Kassel",
+                "Luebeck", 
+                "Stuttgart",
+                "h_kassel.txt"
             ]
         }
     ]
