@@ -96,38 +96,47 @@ def informedSearch(routes, origin, dest, huer):
     fringe = []
 
     fringe.append(Node(None, origin, 0, 0))
-    nodesCreated = 0
+    nodesGen = 0
     nodesExp = 0
     nodesPop = 0
 
-    def loop(nodesCreated, nodesExp, nodesPop):
+    def loop(nodesGen, nodesExp, nodesPop):
         nodesExp += 1
-
         node = fringe.pop(0)
+
+        if(len(fringe) == 0 ):
+            print("Nodes popped: ", nodesPop)
+            print("Nodes expanded: ", nodesExp)
+            print("Nodes generated: ", nodesGen)
+            print("Distance: Infinity")
+            print("Route:\nNone")
 
         if(node.current == dest):
             print("Nodes popped: ", nodesPop)
             print("Nodes Expanded: ", nodesExp)
-            print("Nodes generated", nodesCreated)
+            print("Nodes generated", nodesGen)
             print("Route: ")
             return
 
+        if(node.current in closedSet):
+            return loop(nodesGen, nodesExp, nodesPop)
 
-        loop(nodesCreated, nodesExp, nodesPop)
-
-
-    loop(nodesCreated, nodesExp, nodesPop)
-
+        else:
+            closedSet.append(node.current)
+            for city in routes[node.current]:
 
 
 
-    
+        loop(nodesGen, nodesExp, nodesPop)
+
+    loop(nodesGen, nodesExp, nodesPop)
+
     return
 
 format = ("Not enough arguments.\nPlease use format:\n" 
 "python find_route.py [inputfile.txt] [origin city] [destination city]\n"
 "   or\n"
-"python find_route.py [inputfile.txt] [origin city] [destination city] [heuristicfile.txt] \n")
+"python find_route.py [inputfile.txt] [origin city] [destination city] [heuristicfile.txt]\n")
 
 if(len(sys.argv) < 4 or len(sys.argv) > 5):
     print(format)
