@@ -1,8 +1,9 @@
 import sys
 
 class Node: 
-    def __init__(self, prev, current, distCity):
+    def __init__(self, prev, current, total, distCity):
         self.prev = prev
+        self.total = total + distCity
         self.dist = distCity
         self.current = current
 
@@ -26,7 +27,7 @@ def uninformedSearch(routes, origin, dest):
     nodesExp = 0
     nodesPop = 0
 
-    fringe.append(Node(None, origin, 0))
+    fringe.append(Node(None, origin, 0, 0))
     nodesGen += 1
 
     def loop(nodesGen, nodesExp, nodesPop):
@@ -42,7 +43,6 @@ def uninformedSearch(routes, origin, dest):
         nodesPop += 1
 
         if(node.current == dest):
-            nodesExp -= 1
             prevCity = node.prev
             path = []
             distCity = []
@@ -76,9 +76,9 @@ def uninformedSearch(routes, origin, dest):
 
             for city in routes[node.current]:
                 nodesGen += 1
-                fringe.append(Node(node, city, routes[node.current][city]))
+                fringe.append(Node(node, city, routes[node.current][city] + node.total, routes[node.current][city]))
 
-            fringe.sort(key = (lambda x: x.dist), reverse = True)
+            fringe.sort(key = (lambda x: x.total), reverse = True)
 
         loop(nodesGen, nodesExp, nodesPop)
 
@@ -93,7 +93,7 @@ def informedSearch(routes, origin, dest, huer):
     nodesExp = 0
     nodesPop = 0
 
-    fringe.append(Node(None, origin, 0))
+    fringe.append(Node(None, origin, 0, 0))
     nodesGen += 1
 
     def loop(nodesGen, nodesExp, nodesPop, huer):
@@ -142,7 +142,7 @@ def informedSearch(routes, origin, dest, huer):
 
             for city in routes[node.current]:
                 nodesGen += 1
-                fringe.append(Node(node, city, routes[node.current][city]))
+                fringe.append(Node(node, city, routes[node.current][city] + node.total, routes[node.current][city]))
 
             fringe.sort(key = (lambda x: x.dist + huer[x.current]), reverse = True)
 
