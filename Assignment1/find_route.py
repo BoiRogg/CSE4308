@@ -94,42 +94,61 @@ def readHFile(hFile):
 def informedSearch(routes, origin, dest, huer):
     closedSet = []
     fringe = []
-
-    fringe.append(Node(None, origin, 0, 0))
     nodesGen = 0
     nodesExp = 0
     nodesPop = 0
+    node = None
 
-    def loop(nodesGen, nodesExp, nodesPop):
-        nodesExp += 1
-        node = fringe.pop(0)
+    fringe.append(Node(None, origin, 0, 0))
+    nodesGen += 1
 
+    def loop(nodesGen, nodesExp, nodesPop, huer):
         if(len(fringe) == 0 ):
             print("Nodes popped: ", nodesPop)
             print("Nodes expanded: ", nodesExp)
             print("Nodes generated: ", nodesGen)
             print("Distance: Infinity")
             print("Route:\nNone")
+        
+        node = fringe.pop()
+        nodesPop += 1
 
         if(node.current == dest):
             print("Nodes popped: ", nodesPop)
             print("Nodes Expanded: ", nodesExp)
             print("Nodes generated", nodesGen)
             print("Route: ")
+            prevCity = node.prev
+            path = []
+            dist = []
+            while prevCity != None:
+                path.append(node.current)
+                path.append(prevCity.current)
+                dist.append(node.total)
+                prevCity = prevCity.prev
+                node = node.prev                
+
+            while len(path) != 0:    
+                print(path.pop(), "to", path.pop() + ",", dist.pop(),"km")
+                
             return
 
         if(node.current in closedSet):
-            return loop(nodesGen, nodesExp, nodesPop)
+            return loop(nodesGen, nodesExp, nodesPop, huer)
 
         else:
+            nodesExp += 1
             closedSet.append(node.current)
+
             for city in routes[node.current]:
+                nodesGen += 1
+                fringe.append(Node(node, city, 0, routes[node.current][city]))
 
+            fringe.sort(key = (lambda x: x.total + huer[x.current]), reverse = True)
 
+        loop(nodesGen, nodesExp, nodesPop, huer)
 
-        loop(nodesGen, nodesExp, nodesPop)
-
-    loop(nodesGen, nodesExp, nodesPop)
+    loop(nodesGen, nodesExp, nodesPop, huer)
 
     return
 
