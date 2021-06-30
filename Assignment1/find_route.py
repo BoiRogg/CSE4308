@@ -1,81 +1,81 @@
 from os import readlink
 import sys
 
-def extract(route, path):
-    if(not route): 
-        return path
-    if(len(route) == 1):
-        path.append(route[0])
-    else:
-        path.append(route[1])
-        route = route[0]
-        extract(route, path)
-        return path
+# def extract(route, path):
+#     if(not route): 
+#         return path
+#     if(len(route) == 1):
+#         path.append(route[0])
+#     else:
+#         path.append(route[1])
+#         route = route[0]
+#         extract(route, path)
+#         return path
 
-def uninformedSearch(routes, origin, dest):
-    result = UCS({origin: [0,[origin]]}, {}, routes, origin, dest, [0, 0, 0])
+# def uninformedSearch(routes, origin, dest):
+#     result = UCS({origin: [0,[origin]]}, {}, routes, origin, dest, [0, 0, 0])
 
-    if(result[0][0] > -1):
-        print('Nodes popped: ' + str(result[1][2])) 
-        print('Nodes expanded: ' + str(result[1][0]))
-        print('Nodes generated: ' + str(result[1][1]))
-        print('Distance: ' + str(result[0][0]) + 'km')
-        print('Route: ')
-        route = result[0][1]
-        route = extract(route, [])
-        if(route):
-            route.reverse()
-            for i in range(len(route)-1):
-                print(route[i], 'to', route[i+1], routes[route[i]][route[i+1]], 'km')
-        else:
-            print(origin, 'to', str(dest) + ',', result[0][0], 'km')
+#     if(result[0][0] > -1):
+#         print('Nodes popped: ' + str(result[1][2])) 
+#         print('Nodes expanded: ' + str(result[1][0]))
+#         print('Nodes generated: ' + str(result[1][1]))
+#         print('Distance: ' + str(result[0][0]) + 'km')
+#         print('Route: ')
+#         route = result[0][1]
+#         route = extract(route, [])
+#         if(route):
+#             route.reverse()
+#             for i in range(len(route)-1):
+#                 print(route[i], 'to', route[i+1], routes[route[i]][route[i+1]], 'km')
+#         else:
+#             print(origin, 'to', str(dest) + ',', result[0][0], 'km')
 
-    else:
-        print('Nodes popped: ' + str(result[0][1][2])) 
-        print('Nodes expanded: ' + str(result[0][1][0]))
-        print('Nodes generated: ' + str(result[0][1][1]))
-        print('Distance: Infinity')
-        print('Route:\nNone')
+#     else:
+#         print('Nodes popped: ' + str(result[0][1][2])) 
+#         print('Nodes expanded: ' + str(result[0][1][0]))
+#         print('Nodes generated: ' + str(result[0][1][1]))
+#         print('Distance: Infinity')
+#         print('Route:\nNone')
 
-    return
-def UCS(fringe, closedSet, routes, origin, dest, nodes):
+#     return
+# def UCS(fringe, closedSet, routes, origin, dest, nodes):
     
-    if(not fringe):
-        return [[-1, nodes]]
+#     if(not fringe):
+#         return [[-1, nodes]]
 
-    else:
-        nodes[0] = nodes[0] + 1 
-        closest = min(fringe, key = (lambda k:fringe[k][0]))
+#     else:
+#         nodes[0] = nodes[0] + 1 
+#         closest = min(fringe, key = (lambda k:fringe[k][0]))
 
-        if(dest == closest):
-            return [fringe[closest], nodes]
+#         if(dest == closest):
+#             return [fringe[closest], nodes]
           
-        currPath = fringe.pop(closest)
-        closedSet[closest] = currPath
+#         currPath = fringe.pop(closest)
+#         closedSet[closest] = currPath
 
-        for city in routes[closest]:
-            nodes[1] = nodes[1] + 1
+#         for city in routes[closest]:
+#             nodes[1] = nodes[1] + 1
 
-            if(not (city in closedSet or city in fringe)):
-                fringe[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
-                nodes[2] = nodes[2] + 1
+#             if(not (city in closedSet or city in fringe)):
+#                 fringe[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
+#                 nodes[2] = nodes[2] + 1
 
-            elif(city in fringe or city in closedSet):
+#             elif(city in fringe or city in closedSet):
 
-                if(city in closedSet and closedSet[city][0] > currPath[0] + routes[closest][city]):
-                    closedSet[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
-                    fringe[city] = closedSet.pop(city)
+#                 if(city in closedSet and closedSet[city][0] > currPath[0] + routes[closest][city]):
+#                     closedSet[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
+#                     fringe[city] = closedSet.pop(city)
                     
-                elif(city in fringe and fringe[city][0] > currPath[0] + routes[closest][city]):
-                    fringe[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
+#                 elif(city in fringe and fringe[city][0] > currPath[0] + routes[closest][city]):
+#                     fringe[city] = [currPath[0] + routes[closest][city], [currPath[1], city]]
                     
 
-    return UCS(fringe, closedSet, routes, origin, dest, nodes)
+#     return UCS(fringe, closedSet, routes, origin, dest, nodes)
 
 class Node: 
-    def __init__(self, prev, current, total, dist):
+    def __init__(self, prev, current, total, distCity):
         self.prev = prev
-        self.total = total + dist
+        self.total = total + distCity
         self.current = current
 
 def readHFile(hFile):
@@ -91,45 +91,117 @@ def readHFile(hFile):
     
     return hValues
 
+def uninformedSearch(routes, origin, dest):
+    closedSet = []
+    fringe = []
+    nodesGen = 0
+    nodesExp = 0
+    nodesPop = 0
+
+    fringe.append(Node(None, origin, 0, 0))
+
+    def loop(nodesGen, nodesExp, nodesPop):
+        if(len(fringe) == 0 ):
+            print("Nodes popped:", nodesPop)
+            print("Nodes expanded:", nodesExp)
+            print("Nodes generated:", nodesGen)
+            print("Distance: Infinity")
+            print("Route:\nNone")
+            quit()
+        
+        node = fringe.pop()
+        nodesPop += 1
+
+        if(node.current == dest):
+            nodesExp -= 1
+            prevCity = node.prev
+            path = []
+            distCity = []
+            totalDist = 0
+            
+            while prevCity != None:
+                path.append(node.current)
+                path.append(prevCity.current)
+                distCity.append(node.total)
+                totalDist += node.total
+                prevCity = prevCity.prev
+                node = node.prev 
+
+            print("Nodes popped:", nodesPop)
+            print("Nodes Expanded:", nodesExp)
+            print("Nodes generated", nodesGen)
+            print("Distance:", totalDist, "km")
+            print("Route:")
+                           
+
+            while len(path) != 0:    
+                print(path.pop(), "to", path.pop() + ",", distCity.pop(),"km")
+                
+            return
+
+        if(node.current in closedSet):
+            return loop(nodesGen, nodesExp, nodesPop)
+
+        else:
+            nodesExp += 1
+            closedSet.append(node.current)
+
+            for city in routes[node.current]:
+                nodesGen += 1
+                fringe.append(Node(node, city, 0, routes[node.current][city]))
+
+            fringe.sort(key = (lambda x: x.total), reverse = True)
+
+        loop(nodesGen, nodesExp, nodesPop)
+
+    loop(nodesGen, nodesExp, nodesPop)
+
+    return
+
 def informedSearch(routes, origin, dest, huer):
     closedSet = []
     fringe = []
     nodesGen = 0
     nodesExp = 0
     nodesPop = 0
-    node = None
 
     fringe.append(Node(None, origin, 0, 0))
     nodesGen += 1
 
     def loop(nodesGen, nodesExp, nodesPop, huer):
         if(len(fringe) == 0 ):
-            print("Nodes popped: ", nodesPop)
-            print("Nodes expanded: ", nodesExp)
-            print("Nodes generated: ", nodesGen)
+            print("Nodes popped:", nodesPop)
+            print("Nodes expanded:", nodesExp)
+            print("Nodes generated:", nodesGen)
             print("Distance: Infinity")
             print("Route:\nNone")
+            quit()
         
         node = fringe.pop()
         nodesPop += 1
 
         if(node.current == dest):
-            print("Nodes popped: ", nodesPop)
-            print("Nodes Expanded: ", nodesExp)
-            print("Nodes generated", nodesGen)
-            print("Route: ")
             prevCity = node.prev
             path = []
-            dist = []
+            distCity = []
+            totalDist = 0
+            
             while prevCity != None:
                 path.append(node.current)
                 path.append(prevCity.current)
-                dist.append(node.total)
+                distCity.append(node.total)
+                totalDist += node.total
                 prevCity = prevCity.prev
-                node = node.prev                
+                node = node.prev 
+
+            print("Nodes popped:", nodesPop)
+            print("Nodes Expanded:", nodesExp)
+            print("Nodes generated:", nodesGen)
+            print("Distance:", totalDist, "km")
+            print("Route:")                
 
             while len(path) != 0:    
-                print(path.pop(), "to", path.pop() + ",", dist.pop(),"km")
+                print(path.pop(), "to", path.pop() + ",", distCity.pop(),"km")
                 
             return
 
