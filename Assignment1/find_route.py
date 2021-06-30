@@ -1,9 +1,9 @@
 import sys
 
 class Node: 
-    def __init__(self, prev, current, total, distCity):
+    def __init__(self, prev, current, distCity):
         self.prev = prev
-        self.total = total + distCity
+        self.dist = distCity
         self.current = current
 
 def readHFile(hFile):
@@ -26,7 +26,7 @@ def uninformedSearch(routes, origin, dest):
     nodesExp = 0
     nodesPop = 0
 
-    fringe.append(Node(None, origin, 0, 0))
+    fringe.append(Node(None, origin, 0))
     nodesGen += 1
 
     def loop(nodesGen, nodesExp, nodesPop):
@@ -51,8 +51,8 @@ def uninformedSearch(routes, origin, dest):
             while prevCity != None:
                 path.append(node.current)
                 path.append(prevCity.current)
-                distCity.append(node.total)
-                totalDist += node.total
+                distCity.append(node.dist)
+                totalDist += node.dist
                 prevCity = prevCity.prev
                 node = node.prev 
 
@@ -62,7 +62,6 @@ def uninformedSearch(routes, origin, dest):
             print("Distance:", totalDist, "km")
             print("Route:")
                            
-
             while len(path) != 0:    
                 print(path.pop(), "to", path.pop() + ",", distCity.pop(),"km")
                 
@@ -77,9 +76,9 @@ def uninformedSearch(routes, origin, dest):
 
             for city in routes[node.current]:
                 nodesGen += 1
-                fringe.append(Node(node, city, 0, routes[node.current][city]))
+                fringe.append(Node(node, city, routes[node.current][city]))
 
-            fringe.sort(key = (lambda x: x.total), reverse = True)
+            fringe.sort(key = (lambda x: x.dist), reverse = True)
 
         loop(nodesGen, nodesExp, nodesPop)
 
@@ -94,7 +93,7 @@ def informedSearch(routes, origin, dest, huer):
     nodesExp = 0
     nodesPop = 0
 
-    fringe.append(Node(None, origin, 0, 0))
+    fringe.append(Node(None, origin, 0))
     nodesGen += 1
 
     def loop(nodesGen, nodesExp, nodesPop, huer):
@@ -118,8 +117,8 @@ def informedSearch(routes, origin, dest, huer):
             while prevCity != None:
                 path.append(node.current)
                 path.append(prevCity.current)
-                distCity.append(node.total)
-                totalDist += node.total
+                distCity.append(node.dist)
+                totalDist += node.dist
                 prevCity = prevCity.prev
                 node = node.prev 
 
@@ -143,9 +142,9 @@ def informedSearch(routes, origin, dest, huer):
 
             for city in routes[node.current]:
                 nodesGen += 1
-                fringe.append(Node(node, city, 0, routes[node.current][city]))
+                fringe.append(Node(node, city, routes[node.current][city]))
 
-            fringe.sort(key = (lambda x: x.total + huer[x.current]), reverse = True)
+            fringe.sort(key = (lambda x: x.dist + huer[x.current]), reverse = True)
 
         loop(nodesGen, nodesExp, nodesPop, huer)
 
