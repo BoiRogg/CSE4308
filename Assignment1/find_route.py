@@ -14,7 +14,12 @@ class Node:
 #to create a dictionary of cities along with hueristic  values
 def readHFile(hFile):
     hValues = {}
-    f = open(hFile, 'r')
+    try:
+        f = open(hFile, 'r')
+    except:
+        print(hFile, "file not found. Please check file name and try again.")
+        quit()
+
     input = f.readline()
 
     while("END OF INPUT" not in input):
@@ -186,13 +191,18 @@ def informedSearch(routes, origin, dest, huer):
 #Type checking for the length of command arguemnts, print out correct format when incorrect amount
 #of args are entered
 if(len(sys.argv) < 4 or len(sys.argv) > 5):
-    print("Not enough arguments, please use on of the formats:")
+    print("Not enough arguments, please use one of the following formats:")
     print("python find_route.py [inputfile.txt] [origin city] [destination city]")
     print("python find_route.py [inputfile.txt] [origin city] [destination city] [heuristicfile.txt]")
 
 #If correct command format is entered we will read file of input in to routes dictionary
 else:
-    file = open(sys.argv[1], "r")
+    try:
+        file = open(sys.argv[1], "r")
+    except:
+        print(sys.argv[1], "file not found. Please check file name and try again.")
+        quit()
+
     input = file.readline()
     origin = sys.argv[2]
     dest = sys.argv[3]
