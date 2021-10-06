@@ -1,2 +1,2 @@
 # CSE4308
-Repo for AI assignments
+Using informed and uninformed search to find best route between two cities.
